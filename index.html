@@ -624,7 +624,7 @@
       </div>
       <div class="field">
         <label>Judul Dokumentasi</label>
-        <input type="text" id="judulDok" placeholder="Contoh: Dokumentasi Kegiatan Rapat" oninput="renderPage()">
+        <input type="text" id="judulDok" placeholder="Contoh: TENTANG PROCESOR Rapat" oninput="renderPage()">
       </div>
       <div class="field">
         <label>Keterangan / Deskripsi</label>
@@ -747,7 +747,7 @@
       <div class="page-header" id="pageHeader">
         <div class="ph-left">
           <div class="ph-instansi" id="phInstansi">INSTANSI</div>
-          <div class="ph-title" id="phTitle">Dokumentasi Kegiatan</div>
+          <div class="ph-title" id="phTitle">TENTANG PROCESOR</div>
         </div>
         <div class="ph-right">
           <div class="ph-date" id="phDate"></div>
@@ -922,8 +922,8 @@ function renderPage() {
   const empty = document.getElementById('emptyState');
 
   // Header info
-  const instansi = document.getElementById('instansi').value.trim() || 'INSTANSI / KANTOR';
-  const judul = document.getElementById('judulDok').value.trim() || 'Dokumentasi Kegiatan';
+  const instansi = document.getElementById('instansi').value.trim() || 'CMS006';
+  const judul = document.getElementById('judulDok').value.trim() || 'TENTANG PROCESOR';
   const desc = document.getElementById('deskripsi').value.trim();
   const noDok = document.getElementById('noDok').value.trim();
 
