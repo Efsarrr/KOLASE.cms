@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DokFoto A4 — Dokumentasi Kantor</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0F2340;
+  --blue: #1A4B8C;
+  --sky: #3A7BD5;
+  --gold: #C8922A;
+  --light: #F0F4FA;
+  --border: #D0D9E8;
+  --text: #1A2A3A;
+  --muted: #6B7E99;
+  --pw: 1122px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#CDD5E0; font-family:'IBM Plex Sans',sans-serif; color:var(--text); min-height:100vh; }
+
+/* APP */
+.app { display:grid; grid-template-columns:290px 1fr; grid-template-rows:52px 1fr; min-height:100vh; }
+
+/* TOPBAR */
+.topbar { grid-column:1/-1; background:var(--navy); display:flex; align-items:center; padding:0 1.5rem; gap:0.75rem; border-bottom:3px solid var(--gold); }
+.tb-logo { font-family:'Source Serif 4',serif; font-size:1.15rem; font-weight:700; color:white; }
+.tb-logo em { color:var(--gold); font-style:normal; }
+.tb-sep { width:1px; height:20px; background:rgba(255,255,255,0.15); }
+.tb-sub { font-size:0.68rem; color:rgba(255,255,255,0.4); letter-spacing:2px; text-transform:uppercase; }
+.tb-sp { flex:1; }
+.tb-pill { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); color:rgba(255,255,255,0.6); font-size:0.68rem; padding:0.2rem 0.55rem; border-radius:20px; font-family:'IBM Plex Mono',monospace; }
+
+/* PANEL */
+.panel { background:white; border-right:1px solid var(--border); overflow-y:auto; padding:1.25rem; display:flex; flex-direction:column; gap:1.2rem; }
+.sec { display:flex; flex-direction:column; gap:0.5rem; }
+.sec-label { font-size:0.6rem; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--muted); display:flex; align-items:center; gap:0.4rem; }
+.sec-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+.upzone { border:2px dashed var(--border); border-radius:8px; padding:1.2rem 0.75rem; text-align:center; cursor:pointer; transition:all 0.2s; background:var(--light); }
+.upzone:hover,.upzone.over { border-color:var(--sky); background:#EAF1FB; }
+.upzone input { display:none; }
+.uz-t { font-size:0.8rem; font-weight:600; color:var(--blue); display:block; }
+.uz-s { font-size:0.7rem; color:var(--muted); display:block; margin-top:2px; }
+
+.tgrid { display:grid; grid-template-columns:repeat(4,1fr); gap:0.35rem; }
+.ti { aspect-ratio:1; border-radius:5px; overflow:hidden; position:relative; border:1.5px solid var(--border); transition:transform 0.15s; }
+.ti:hover { transform:scale(1.06); border-color:var(--sky); }
+.ti img { width:100%; height:100%; object-fit:cover; display:block; }
+.ti-rm { position:absolute; top:1px; right:1px; width:14px; height:14px; background:#E53935; border:none; border-radius:50%; color:white; font-size:7px; display:flex; align-items:center; justify-content:center; opacity:0; cursor:pointer; transition:opacity 0.15s; }
+.ti:hover .ti-rm { opacity:1; }
+.ti-crop { position:absolute; bottom:1px; right:1px; width:18px; height:18px; background:rgba(26,75,140,0.85); border:none; border-radius:3px; color:white; font-size:10px; display:flex; align-items:center; justify-content:center; opacity:0; cursor:pointer; transition:opacity 0.15s; }
+.ti:hover .ti-crop { opacity:1; }
+.ti-cropped { position:absolute; top:1px; left:1px; width:14px; height:14px; background:rgba(26,75,140,0.85); border-radius:3px; display:none; align-items:center; justify-content:center; }
+.ti-cropped.on { display:flex; }
+
+.field { display:flex; flex-direction:column; gap:0.25rem; }
+.field label { font-size:0.7rem; font-weight:500; color:var(--muted); }
+.field input,.field textarea,.field select { padding:0.4rem 0.65rem; border:1px solid var(--border); border-radius:6px; font-family:'IBM Plex Sans',sans-serif; font-size:0.8rem; color:var(--text); background:white; width:100%; transition:border-color 0.2s; }
+.field input:focus,.field textarea:focus { outline:none; border-color:var(--sky); box-shadow:0 0 0 3px rgba(58,123,213,0.1); }
+.field textarea { resize:vertical; min-height:52px; line-height:1.5; }
+
+.lo-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.35rem; }
+.lo { border:1.5px solid var(--border); border-radius:6px; padding:0.4rem; cursor:pointer; background:var(--light); transition:all 0.2s; text-align:center; }
+.lo:hover { border-color:var(--sky); }
+.lo.active { border-color:var(--blue); background:#EAF1FB; }
+.lo .lp { display:grid; gap:2px; width:100%; aspect-ratio:1.41; margin-bottom:0.2rem; border-radius:2px; overflow:hidden; }
+.lp-cell { background:var(--border); border-radius:1px; }
+.lo.active .lp-cell { background:var(--sky); opacity:0.6; }
+.lo.active .lp-cell.main { background:var(--blue); opacity:1; }
+.lp-1 { grid-template-columns:1fr; }
+.lp-2h { grid-template-columns:1fr 1fr; }
+.lp-2v { grid-template-rows:1fr 1fr; }
+.lp-3 { grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; }
+.lp-3 .lp-cell.main { grid-column:span 2; }
+.lp-4 { grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; }
+.lo span { font-size:0.62rem; font-weight:500; color:var(--muted); }
+.lo.active span { color:var(--blue); }
+
+.hdr-opts { display:grid; grid-template-columns:1fr 1fr; gap:0.35rem; }
+.hdr-opt { border:1.5px solid var(--border); border-radius:6px; padding:0.4rem 0.5rem; cursor:pointer; font-size:0.72rem; font-weight:500; color:var(--muted); text-align:center; background:var(--light); transition:all 0.2s; }
+.hdr-opt:hover { border-color:var(--sky); }
+.hdr-opt.active { border-color:var(--blue); background:#EAF1FB; color:var(--blue); }
+
+.color-row { display:flex; gap:0.35rem; align-items:center; flex-wrap:wrap; }
+.cdot { width:22px; height:22px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:transform 0.15s,border-color 0.15s; flex-shrink:0; }
+.cdot:hover { transform:scale(1.2); }
+.cdot.active { border-color:var(--navy); }
+input[type="color"].cpick { width:22px; height:22px; border-radius:50%; border:2px solid var(--border); cursor:pointer; padding:1px; }
+
+.btn { padding:0.5rem 0.9rem; border-radius:6px; border:none; cursor:pointer; font-family:'IBM Plex Sans',sans-serif; font-size:0.78rem; font-weight:500; display:flex; align-items:center; justify-content:center; gap:0.35rem; transition:all 0.2s; }
+.btn-p { background:var(--blue); color:white; }
+.btn-p:hover { background:#153D75; transform:translateY(-1px); box-shadow:0 4px 12px rgba(26,75,140,0.3); }
+.btn-s { background:var(--light); color:var(--text); border:1px solid var(--border); }
+.btn-s:hover { border-color:var(--sky); color:var(--sky); }
+.btn-d { background:#FEE9E7; color:#C62828; border:1px solid #FFCDD2; }
+.btn-d:hover { background:#FFCDD2; }
+.brow { display:flex; gap:0.4rem; }
+.brow .btn { flex:1; }
+
+/* PREVIEW */
+.preview-area { overflow:auto; padding:1.5rem; display:flex; flex-direction:column; align-items:center; gap:1.25rem; background:#CDD5E0; }
+.ptbar { display:flex; align-items:center; gap:0.6rem; width:var(--pw); max-width:100%; }
+.ptbar-lbl { font-size:0.65rem; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); }
+.ptbar-sp { flex:1; }
+.ptbar-info { font-size:0.68rem; color:var(--muted); font-family:'IBM Plex Mono',monospace; background:white; padding:0.2rem 0.55rem; border-radius:4px; border:1px solid var(--border); }
+
+.empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.75rem; text-align:center; width:var(--pw); min-height:300px; background:white; border-radius:4px; border:2px dashed var(--border); color:var(--muted); padding:2rem; }
+.empty-state .ei { font-size:2.5rem; opacity:0.3; }
+.empty-state h3 { font-family:'Source Serif 4',serif; font-size:1.1rem; }
+.empty-state p { font-size:0.8rem; opacity:0.7; max-width:260px; line-height:1.6; }
+
+/* ===== A4 PAGE ===== */
+.a4 { width:var(--pw); background:white; box-shadow:0 12px 48px rgba(0,0,0,0.22),0 2px 8px rgba(0,0,0,0.1); border-radius:2px; overflow:hidden; }
+
+/* Slim datebar */
+.a4-datebar { padding:7px 22px; display:flex; align-items:center; justify-content:space-between; border-bottom:2.5px solid var(--gold); }
+.adb-l { display:flex; align-items:center; gap:10px; }
+.adb-inst { font-size:9px; font-weight:600; color:rgba(255,255,255,0.55); letter-spacing:2px; text-transform:uppercase; }
+.adb-sep { width:1px; height:12px; background:rgba(255,255,255,0.2); }
+.adb-judul { font-family:'Source Serif 4',serif; font-size:13px; font-weight:700; color:white; }
+.adb-r { display:flex; flex-direction:column; align-items:flex-end; gap:1px; }
+.adb-tgl { font-size:9px; color:rgba(255,255,255,0.65); font-family:'IBM Plex Mono',monospace; }
+.adb-nodok { font-size:8px; color:rgba(255,255,255,0.35); font-family:'IBM Plex Mono',monospace; letter-spacing:0.5px; }
+
+.a4-body { padding:10px 16px 6px; }
+.a4-desc { font-size:9.5px; color:var(--muted); line-height:1.55; padding:5px 10px; background:var(--light); border-left:3px solid var(--gold); border-radius:0 3px 3px 0; margin-bottom:8px; }
+
+/* Photo grid */
+.pg { display:grid; gap:8px; }
+.pg-1  { grid-template-columns:1fr; }
+.pg-2h { grid-template-columns:1fr 1fr; }
+.pg-2v { grid-template-columns:1fr; }
+.pg-3  { grid-template-columns:1fr 1fr; }
+.pg-3 .pc:first-child { grid-column:span 2; }
+.pg-4  { grid-template-columns:1fr 1fr; }
+
+/* Photo cell — NO forced crop, image shown at natural ratio inside fixed-height wrapper */
+.pc { border-radius:4px; overflow:hidden; border:1px solid var(--border); position:relative; background:#1A2A3A; }
+.pc-img { position:relative; overflow:hidden; line-height:0; }
+.pc-img img { width:100%; height:100%; object-fit:cover; display:block; }
+
+/* HDR gradient */
+.pc-hdr { position:absolute; bottom:0; left:0; right:0; height:55%; background:linear-gradient(to top,rgba(0,0,0,0.75) 0%,rgba(0,0,0,0) 100%); pointer-events:none; display:none; }
+/* HDR caption on top of image */
+.pc-cap-ov { position:absolute; bottom:0; left:0; right:0; padding:7px 10px 6px; display:none; align-items:center; justify-content:space-between; gap:0.5rem; }
+.pc-cap-ov .ct { font-size:9.5px; font-weight:500; color:white; text-shadow:0 1px 3px rgba(0,0,0,0.9); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pc-cap-ov .cn { font-size:7.5px; color:rgba(255,255,255,0.75); font-family:'IBM Plex Mono',monospace; background:rgba(0,0,0,0.4); padding:1px 5px; border-radius:3px; flex-shrink:0; }
+/* Standard white caption bar */
+.pc-cap-bar { padding:4px 10px; background:white; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:0.4rem; }
+.pc-cap-bar .ct { font-size:9px; font-weight:500; color:var(--text); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pc-cap-bar .cn { font-size:8px; color:var(--muted); font-family:'IBM Plex Mono',monospace; background:var(--light); padding:1px 5px; border-radius:3px; border:1px solid var(--border); flex-shrink:0; }
+
+.a4-footer { margin-top:4px; padding:5px 16px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; background:var(--light); }
+.a4-footer span { font-size:7.5px; color:var(--muted); font-family:'IBM Plex Mono',monospace; }
+
+/* ===== CROP MODAL ===== */
+.crop-modal { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.78); align-items:center; justify-content:center; }
+.crop-modal.open { display:flex; }
+.crop-box { background:white; border-radius:12px; padding:1.5rem; width:640px; max-width:95vw; display:flex; flex-direction:column; gap:1rem; box-shadow:0 24px 80px rgba(0,0,0,0.45); }
+.crop-title { font-family:'Source Serif 4',serif; font-size:1.1rem; font-weight:700; color:var(--navy); }
+.crop-sub { font-size:0.75rem; color:var(--muted); margin-top:-0.5rem; }
+.crop-stage { position:relative; background:#0A0A14; border-radius:8px; overflow:hidden; cursor:crosshair; user-select:none; line-height:0; max-height:400px; }
+.crop-stage img { width:100%; display:block; pointer-events:none; max-height:400px; object-fit:contain; }
+.crop-sel { position:absolute; border:2px solid white; box-shadow:0 0 0 9999px rgba(0,0,0,0.48); pointer-events:none; display:none; }
+.crop-sel::after { content:''; position:absolute; inset:0; background:repeating-linear-gradient(0deg,transparent,transparent 33%,rgba(255,255,255,0.12) 33%,rgba(255,255,255,0.12) 34%),repeating-linear-gradient(90deg,transparent,transparent 33%,rgba(255,255,255,0.12) 33%,rgba(255,255,255,0.12) 34%); }
+.crop-actions { display:flex; gap:0.5rem; justify-content:flex-end; align-items:center; }
+.crop-info { font-size:0.7rem; color:var(--muted); flex:1; font-family:'IBM Plex Mono',monospace; }
+
+@media print {
+  body { background:white; }
+  .app { display:block; }
+  .topbar,.panel,.preview-area>.ptbar,.empty-state { display:none !important; }
+  .preview-area { padding:0; background:white; align-items:flex-start; }
+  .a4 { width:297mm; box-shadow:none; border-radius:0; }
+  @page { size:A4 landscape; margin:0; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="topbar">
+  <div class="tb-logo">Dok<em>Foto</em></div>
+  <div class="tb-sep"></div>
+  <div class="tb-sub">Dokumentasi Kantor · A4 Landscape</div>
+  <div class="tb-sp"></div>
+  <div class="tb-pill" id="photoBadge">0 foto</div>
+</div>
+
+<aside class="panel">
+  <div class="sec">
+    <div class="sec-label">Upload Foto</div>
+    <div class="upzone" id="upzone">
+      <input type="file" id="fileInput" multiple accept="image/*">
+      <span style="font-size:1.8rem;display:block;margin-bottom:0.3rem">📂</span>
+      <span class="uz-t">Klik atau seret foto ke sini</span>
+      <span class="uz-s">Maks 4 foto · JPG, PNG, WEBP</span>
+    </div>
+    <div class="tgrid" id="thumbGrid"></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Info Dokumen</div>
+    <div class="field"><label>Nama Instansi / Kantor</label><input type="text" id="instansi" placeholder="Contoh: Dinas PU Kab. Ciamis" oninput="render()"></div>
+    <div class="field"><label>Judul Kegiatan</label><input type="text" id="judul" placeholder="Contoh: Rapat Koordinasi Tim" oninput="render()"></div>
+    <div class="field"><label>Keterangan Kegiatan</label><textarea id="desc" placeholder="Tulis deskripsi kegiatan..." oninput="render()"></textarea></div>
+    <div class="field"><label>Nomor Dokumen (opsional)</label><input type="text" id="nodok" placeholder="001/DPU/III/2026" oninput="render()"></div>
+    <div class="field"><label>Tanggal (kosongkan = hari ini)</label><input type="text" id="tgl" placeholder="Senin, 10 Maret 2026" oninput="render()"></div>
+  </div>
+
+  <div class="sec" id="captionSec" style="display:none">
+    <div class="sec-label">Keterangan Per Foto</div>
+    <div id="captionFields"></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Tata Letak</div>
+    <div class="lo-grid">
+      <div class="lo active" onclick="setLayout(this,'auto')">
+        <div class="lp lp-4"><div class="lp-cell main"></div><div class="lp-cell"></div><div class="lp-cell"></div><div class="lp-cell"></div></div>
+        <span>Otomatis</span>
+      </div>
+      <div class="lo" onclick="setLayout(this,'1')">
+        <div class="lp lp-1"><div class="lp-cell main"></div></div>
+        <span>1 Foto</span>
+      </div>
+      <div class="lo" onclick="setLayout(this,'2h')">
+        <div class="lp lp-2h"><div class="lp-cell main"></div><div class="lp-cell"></div></div>
+        <span>2 Samping</span>
+      </div>
+      <div class="lo" onclick="setLayout(this,'2v')">
+        <div class="lp lp-2v"><div class="lp-cell main"></div><div class="lp-cell"></div></div>
+        <span>2 Tumpuk</span>
+      </div>
+      <div class="lo" onclick="setLayout(this,'3')">
+        <div class="lp lp-3"><div class="lp-cell main"></div><div class="lp-cell"></div><div class="lp-cell"></div></div>
+        <span>3 Foto</span>
+      </div>
+      <div class="lo" onclick="setLayout(this,'4')">
+        <div class="lp lp-4"><div class="lp-cell main"></div><div class="lp-cell"></div><div class="lp-cell"></div><div class="lp-cell"></div></div>
+        <span>4 Foto</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Efek Keterangan Foto</div>
+    <div class="hdr-opts">
+      <div class="hdr-opt active" onclick="setHdr('none',this)">📋 Bar Putih</div>
+      <div class="hdr-opt" onclick="setHdr('overlay',this)">✨ HDR Overlay</div>
+    </div>
+    <small style="font-size:0.68rem;color:var(--muted);line-height:1.5;margin-top:0.1rem">HDR: gradien gelap di bawah foto agar teks terlihat jelas di atas gambar.</small>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Warna Tema</div>
+    <div class="color-row">
+      <div class="cdot active" style="background:#0F2340" onclick="setColor('#0F2340','#C8922A',this)"></div>
+      <div class="cdot" style="background:#1B4332" onclick="setColor('#1B4332','#D4AF37',this)"></div>
+      <div class="cdot" style="background:#5C1010" onclick="setColor('#5C1010','#E8A020',this)"></div>
+      <div class="cdot" style="background:#1A1A2E" onclick="setColor('#1A1A2E','#A78BFA',this)"></div>
+      <div class="cdot" style="background:#1C1C1C" onclick="setColor('#1C1C1C','#E5E5E5',this)"></div>
+      <div class="cdot" style="background:#2C3E6B" onclick="setColor('#2C3E6B','#F4C842',this)"></div>
+      <input type="color" class="cpick" value="#0F2340" onchange="setColor(this.value,'#C8922A',null)">
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Aksi</div>
+    <div class="brow"><button class="btn btn-p" onclick="window.print()">🖨 Cetak / Simpan PDF</button></div>
+    <div class="brow" style="margin-top:0.35rem">
+      <button class="btn btn-s" onclick="resetAll()">↺ Reset</button>
+      <button class="btn btn-d" onclick="clearPhotos()">🗑 Hapus Foto</button>
+    </div>
+  </div>
+</aside>
+
+<main class="preview-area">
+  <div class="ptbar">
+    <span class="ptbar-lbl">Pratinjau A4 Landscape</span>
+    <div class="ptbar-sp"></div>
+    <span class="ptbar-info">A4 Landscape · 297 × 210 mm</span>
+  </div>
+
+  <div class="empty-state" id="emptyState">
+    <div class="ei">📄</div>
+    <h3>Belum ada foto</h3>
+    <p>Upload foto di panel kiri dan isi info dokumen untuk pratinjau cetak A4.</p>
+  </div>
+
+  <div class="a4" id="a4" style="display:none">
+    <div class="a4-datebar" id="a4Datebar">
+      <div class="adb-l">
+        <div class="adb-inst" id="aInst">INSTANSI</div>
+        <div class="adb-sep"></div>
+        <div class="adb-judul" id="aJudul">Dokumentasi Kegiatan</div>
+      </div>
+      <div class="adb-r">
+        <div class="adb-tgl" id="aTgl"></div>
+        <div class="adb-nodok" id="aNodok"></div>
+      </div>
+    </div>
+    <div class="a4-body">
+      <div class="a4-desc" id="aDesc" style="display:none"></div>
+      <div class="pg" id="photoGrid"></div>
+    </div>
+    <div class="a4-footer">
+      <span id="aFL"></span>
+      <span id="aFR">Halaman 1</span>
+    </div>
+  </div>
+</main>
+</div>
+
+<!-- CROP MODAL -->
+<div class="crop-modal" id="cropModal">
+  <div class="crop-box">
+    <div class="crop-title">✂ Crop Foto</div>
+    <div class="crop-sub">Klik dan seret pada gambar untuk memilih area yang ingin ditampilkan.</div>
+    <div class="crop-stage" id="cropStage">
+      <img id="cropImg" src="" alt="">
+      <div class="crop-sel" id="cropSel"></div>
+    </div>
+    <div class="crop-actions">
+      <span class="crop-info" id="cropInfo">Seret untuk memilih area</span>
+      <button class="btn btn-s" onclick="closeCrop()">Batal</button>
+      <button class="btn btn-s" onclick="resetCrop()">↺ Reset Crop</button>
+      <button class="btn btn-p" id="cropApplyBtn" onclick="applyCrop()" disabled>✓ Terapkan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let photos = [];
+let layout  = 'auto';
+let hdrMode = 'none';
+let navCol  = '#0F2340';
+let goldCol = '#C8922A';
+let cropIdx = -1;
+let cropData = null;
+let cropDrag = { active:false, sx:0, sy:0, cx:0, cy:0 };
+
+function dateID() {
+  const d = new Date();
+  const D = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const M = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  return `${D[d.getDay()]}, ${d.getDate()} ${M[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+// Upload
+const upzone   = document.getElementById('upzone');
+const fileInput = document.getElementById('fileInput');
+upzone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => loadFiles(e.target.files));
+upzone.addEventListener('dragover', e => { e.preventDefault(); upzone.classList.add('over'); });
+upzone.addEventListener('dragleave', () => upzone.classList.remove('over'));
+upzone.addEventListener('drop', e => { e.preventDefault(); upzone.classList.remove('over'); loadFiles(e.dataTransfer.files); });
+
+function loadFiles(files) {
+  const arr = Array.from(files).filter(f => f.type.startsWith('image/'));
+  const rem = 4 - photos.length;
+  if (!rem) { alert('Maksimal 4 foto per halaman.'); return; }
+  const list = arr.slice(0, rem);
+  let done = 0;
+  list.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        photos.push({ img, src: e.target.result, name: file.name, caption: '', crop: null });
+        if (++done === list.length) { updateThumbs(); updateCaptions(); render(); }
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function updateThumbs() {
+  const g = document.getElementById('thumbGrid');
+  document.getElementById('photoBadge').textContent = `${photos.length} foto`;
+  g.innerHTML = '';
+  photos.forEach((p, i) => {
+    const d = document.createElement('div');
+    d.className = 'ti';
+    const cropBadge = p.crop ? `<div class="ti-cropped on" title="Sudah di-crop"><span style="font-size:8px;color:white">✂</span></div>` : '';
+    d.innerHTML = `<img src="${p.crop ? getCroppedSrc(p) : p.src}">
+      <button class="ti-rm" onclick="removePhoto(${i})">✕</button>
+      <button class="ti-crop" title="Crop foto" onclick="openCrop(${i})">✂</button>
+      ${cropBadge}`;
+    g.appendChild(d);
+  });
+}
+
+function getCroppedSrc(p) {
+  if (!p.crop) return p.src;
+  const c = document.createElement('canvas');
+  c.width = p.crop.sw; c.height = p.crop.sh;
+  c.getContext('2d').drawImage(p.img, p.crop.sx, p.crop.sy, p.crop.sw, p.crop.sh, 0, 0, p.crop.sw, p.crop.sh);
+  return c.toDataURL();
+}
+
+function removePhoto(i) { photos.splice(i,1); updateThumbs(); updateCaptions(); render(); }
+
+function clearPhotos() {
+  photos = []; fileInput.value = '';
+  updateThumbs(); updateCaptions();
+  document.getElementById('emptyState').style.display = 'flex';
+  document.getElementById('a4').style.display = 'none';
+}
+
+function resetAll() {
+  clearPhotos();
+  ['instansi','judul','desc','nodok','tgl'].forEach(id => document.getElementById(id).value = '');
+  render();
+}
+
+function updateCaptions() {
+  const sec = document.getElementById('captionSec');
+  const f   = document.getElementById('captionFields');
+  f.innerHTML = '';
+  if (!photos.length) { sec.style.display = 'none'; return; }
+  sec.style.display = '';
+  photos.forEach((p, i) => {
+    const d = document.createElement('div');
+    d.className = 'field'; d.style.marginBottom = '0.4rem';
+    d.innerHTML = `<label>Foto ${i+1} · ${p.name.substring(0,22)}</label>
+      <input type="text" placeholder="Keterangan foto ${i+1}..." value="${p.caption}"
+        oninput="photos[${i}].caption=this.value;render()">`;
+    f.appendChild(d);
+  });
+}
+
+function setLayout(el, l) {
+  document.querySelectorAll('.lo').forEach(b => b.classList.remove('active'));
+  el.classList.add('active'); layout = l; render();
+}
+
+function setHdr(mode, el) {
+  hdrMode = mode;
+  document.querySelectorAll('.hdr-opt').forEach(b => b.classList.remove('active'));
+  el.classList.add('active'); render();
+}
+
+function setColor(nav, gold, el) {
+  navCol = nav; goldCol = gold;
+  document.querySelectorAll('.cdot').forEach(d => d.classList.remove('active'));
+  if (el) el.classList.add('active'); render();
+}
+
+function effLayout() {
+  if (layout !== 'auto') return layout;
+  const n = photos.length;
+  return n===1?'1':n===2?'2h':n===3?'3':'4';
+}
+
+function render() {
+  const a4    = document.getElementById('a4');
+  const empty = document.getElementById('emptyState');
+
+  const instansi = document.getElementById('instansi').value.trim() || 'INSTANSI / KANTOR';
+  const judul    = document.getElementById('judul').value.trim()    || 'Dokumentasi Kegiatan';
+  const desc     = document.getElementById('desc').value.trim();
+  const nodok    = document.getElementById('nodok').value.trim();
+  const tgl      = document.getElementById('tgl').value.trim()      || dateID();
+
+  document.getElementById('aInst').textContent  = instansi.toUpperCase();
+  document.getElementById('aJudul').textContent = judul;
+  document.getElementById('aTgl').textContent   = tgl;
+  document.getElementById('aNodok').textContent = nodok ? `No. ${nodok}` : '';
+
+  const datebar = document.getElementById('a4Datebar');
+  datebar.style.background       = navCol;
+  datebar.style.borderBottomColor = goldCol;
+
+  const aDesc = document.getElementById('aDesc');
+  if (desc) { aDesc.style.display=''; aDesc.textContent=desc; aDesc.style.borderLeftColor=goldCol; }
+  else aDesc.style.display = 'none';
+
+  document.getElementById('aFL').textContent = instansi;
+  document.getElementById('aFR').textContent = `${tgl} · Halaman 1`;
+
+  if (!photos.length) { empty.style.display='flex'; a4.style.display='none'; return; }
+  empty.style.display = 'none'; a4.style.display = '';
+
+  const ef   = effLayout();
+  const grid = document.getElementById('photoGrid');
+  grid.innerHTML = '';
+  grid.className = `pg pg-${ef}`;
+
+  // Height budget: A4 landscape body
+  // Page ~794px total. datebar~36, footer~26, body-pad~16, desc~(desc?28:0), gap 8
+  const descH   = desc ? 28 : 0;
+  const bodyH   = 794 - 36 - 26 - 16 - descH;
+  const capH    = hdrMode === 'overlay' ? 0 : 22;
+  const gap     = 8;
+
+  // Rows in layout
+  const rows = (ef==='2v'||ef==='4'||ef==='3') ? 2 : 1;
+  const imgH = Math.max(Math.floor((bodyH - gap*(rows-1))/rows) - capH, 80);
+
+  photos.forEach((p, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'pc';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'pc-img';
+    wrap.style.height = imgH + 'px';
+
+    const img = document.createElement('img');
+    img.src = p.crop ? getCroppedSrc(p) : p.src;
+    wrap.appendChild(img);
+
+    if (hdrMode === 'overlay') {
+      const hdr = document.createElement('div'); hdr.className='pc-hdr'; hdr.style.display='block'; wrap.appendChild(hdr);
+      const capOv = document.createElement('div'); capOv.className='pc-cap-ov'; capOv.style.display='flex';
+      capOv.innerHTML=`<span class="ct">${p.caption||'Foto '+(i+1)}</span><span class="cn">Foto ${i+1}</span>`;
+      wrap.appendChild(capOv);
+    }
+
+    cell.appendChild(wrap);
+
+    if (hdrMode !== 'overlay') {
+      const bar = document.createElement('div'); bar.className='pc-cap-bar';
+      bar.innerHTML=`<span class="ct">${p.caption||'Foto '+(i+1)}</span><span class="cn">Foto ${i+1}</span>`;
+      cell.appendChild(bar);
+    }
+
+    grid.appendChild(cell);
+  });
+}
+
+// ── CROP ──
+const cropStage = document.getElementById('cropStage');
+const cropSel   = document.getElementById('cropSel');
+const cropImgEl = document.getElementById('cropImg');
+
+function openCrop(idx) {
+  cropIdx = idx;
+  cropImgEl.src = photos[idx].src;
+  cropSel.style.display = 'none';
+  document.getElementById('cropApplyBtn').disabled = true;
+  document.getElementById('cropInfo').textContent = 'Seret untuk memilih area';
+  cropData = null;
+  document.getElementById('cropModal').classList.add('open');
+}
+
+function closeCrop() { document.getElementById('cropModal').classList.remove('open'); cropIdx = -1; }
+
+function resetCrop() {
+  if (cropIdx < 0) return;
+  photos[cropIdx].crop = null;
+  closeCrop(); updateThumbs(); render();
+}
+
+cropStage.addEventListener('mousedown', e => {
+  const r = cropStage.getBoundingClientRect();
+  cropDrag = { active:true, sx:e.clientX-r.left, sy:e.clientY-r.top, cx:e.clientX-r.left, cy:e.clientY-r.top };
+  cropSel.style.display = 'none';
+  e.preventDefault();
+});
+
+window.addEventListener('mousemove', e => {
+  if (!cropDrag.active) return;
+  const r = cropStage.getBoundingClientRect();
+  cropDrag.cx = Math.min(Math.max(e.clientX-r.left, 0), r.width);
+  cropDrag.cy = Math.min(Math.max(e.clientY-r.top,  0), r.height);
+  const x=Math.min(cropDrag.sx,cropDrag.cx), y=Math.min(cropDrag.sy,cropDrag.cy);
+  const w=Math.abs(cropDrag.cx-cropDrag.sx), h=Math.abs(cropDrag.cy-cropDrag.sy);
+  if (w>5&&h>5) {
+    cropSel.style.cssText += `display:block;left:${x}px;top:${y}px;width:${w}px;height:${h}px;`;
+  }
+});
+
+window.addEventListener('mouseup', () => {
+  if (!cropDrag.active) return;
+  cropDrag.active = false;
+  const r = cropStage.getBoundingClientRect();
+  const dispW = r.width, dispH = cropImgEl.offsetHeight;
+  const natW = cropImgEl.naturalWidth, natH = cropImgEl.naturalHeight;
+  // cropImg has object-fit:contain so compute actual rendered size
+  const scale = Math.min(dispW/natW, dispH/natH);
+  const rendW = natW*scale, rendH = natH*scale;
+  const offX = (dispW-rendW)/2, offY = (dispH-rendH)/2;
+
+  const x=Math.min(cropDrag.sx,cropDrag.cx), y=Math.min(cropDrag.sy,cropDrag.cy);
+  const w=Math.abs(cropDrag.cx-cropDrag.sx), h=Math.abs(cropDrag.cy-cropDrag.sy);
+  if (w<10||h<10) return;
+
+  // Convert display coords → natural image coords
+  const sx = Math.round((x-offX)/scale);
+  const sy = Math.round((y-offY)/scale);
+  const sw = Math.round(w/scale);
+  const sh = Math.round(h/scale);
+  cropData = {
+    sx: Math.max(0,sx), sy: Math.max(0,sy),
+    sw: Math.min(sw, natW-Math.max(0,sx)),
+    sh: Math.min(sh, natH-Math.max(0,sy))
+  };
+  document.getElementById('cropApplyBtn').disabled = false;
+  document.getElementById('cropInfo').textContent = `${cropData.sw} × ${cropData.sh}px`;
+});
+
+function applyCrop() {
+  if (cropIdx<0||!cropData) return;
+  photos[cropIdx].crop = cropData;
+  closeCrop(); updateThumbs(); render();
+}
+
+// init
+document.getElementById('aTgl').textContent = dateID();
+render();
+</script>
+</body>
+</html>
